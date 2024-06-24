@@ -10,8 +10,16 @@ import {
   useExplorer,
 } from "@starknet-react/core";
 import { useMemo, useState } from "react";
+import { useStringFromByteArray } from "../../hooks";
 
 export default function Home() {
+  const [nameValue, setNameValue] = useState("");
+  const [symbolValue, setSymbolValue] = useState("");
+  const [totalSupplyValue, setTotalSupplyValue] = useState("");
+  const [decimalValue, setDecimalValue] = useState("");
+  const [balanceValue, setBalanceValue] = useState("");
+  const [allowanceValue, setAllowanceValue] = useState("");
+
   const [formData, setFormData] = useState({
     balanceAccount: "",
     approveSpender: "",
@@ -43,8 +51,17 @@ export default function Home() {
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     args: [],
-    watch: true,
   });
+  const handleGetName = () => {
+    if (nameData) {
+      nameRefetch();
+      const res = nameData as { [key: string]: any };
+      const hexStr = useStringFromByteArray({
+        pending_word: res.pending_word,
+      });
+      setNameValue(hexStr);
+    }
+  };
 
   const {
     data: symbolData,
@@ -55,8 +72,18 @@ export default function Home() {
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     args: [],
-    watch: true,
+    parseResult: true,
   });
+  const handleGetSymbol = () => {
+    if (symbolData) {
+      symbolRefetch();
+      const res = symbolData as { [key: string]: any };
+      const hexStr = useStringFromByteArray({
+        pending_word: res.pending_word,
+      });
+      setSymbolValue(hexStr);
+    }
+  };
 
   const {
     data: totalSupplyData,
@@ -67,8 +94,14 @@ export default function Home() {
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     args: [],
-    watch: true,
   });
+
+  const handleGetTotalSupply = () => {
+    if (totalSupplyData) {
+      totalSupplyRefetch();
+      setTotalSupplyValue(totalSupplyData.toString());
+    }
+  };
 
   const {
     data: decimalData,
@@ -79,8 +112,14 @@ export default function Home() {
     abi: CONTRACT_ABI,
     address: CONTRACT_ADDRESS,
     args: [],
-    watch: true,
   });
+
+  const handleGetDecimal = () => {
+    if (decimalData) {
+      decimalRefetch();
+      setDecimalValue(decimalData?.toString());
+    }
+  };
 
   const {
     data: balanceOfData,
@@ -94,6 +133,13 @@ export default function Home() {
     watch: true,
   });
 
+  const handleGetBalance = () => {
+    if (balanceOfData) {
+      balanceOfRefetch();
+      setBalanceValue(balanceOfData.toString());
+    }
+  };
+
   const {
     data: allowanceData,
     error: allowanceError,
@@ -105,7 +151,12 @@ export default function Home() {
     args: [formData.allowanceOwner, formData.allowanceSender],
     watch: true,
   });
-
+  const handleGetAllowance = () => {
+    if (allowanceData) {
+      allowanceRefetch();
+      setAllowanceValue(allowanceData.toString());
+    }
+  };
   const { contract } = useContract({
     address: CONTRACT_ADDRESS,
     abi: CONTRACT_ABI,
@@ -203,32 +254,27 @@ export default function Home() {
       <WalletBar />
       <section className="py-20 flex flex-col gap-8">
         <div className="flex flex-wrap justify-between items-center gap-4  w-full p border-solid border-b-2 border-emerald-950 py-4">
-          <p>Name: {nameData ? nameData.toString() : ""}</p>
+          <p>Name: {nameValue ? nameValue : ""}</p>
           <button
-            onClick={() => nameRefetch}
+            onClick={handleGetName}
             className="bg-emerald-800 text-white px-8 py-2 rounded-full text-ellipsis whitespace-nowrap overflow-hidden"
           >
             Query
           </button>
         </div>
         <div className="flex flex-wrap justify-between items-center gap-4  w-full p border-solid border-b-2 border-emerald-950 py-4">
-          <p>Symbol: {symbolData ? symbolData.toString() : ""}</p>
+          <p>Symbol: {symbolValue ? symbolValue : ""}</p>
           <button
-            onClick={() => symbolRefetch}
+            onClick={handleGetSymbol}
             className="bg-emerald-800 text-white px-8 py-2 rounded-full text-ellipsis whitespace-nowrap overflow-hidden"
           >
             Query
           </button>
         </div>
         <div className="flex flex-wrap justify-between items-center gap-4  w-full p border-solid border-b-2 border-emerald-950 py-4">
-          <p>
-            Total supply:{" "}
-            {totalSupplyData
-              ? Number(totalSupplyData) / 10 ** Number(decimalData)
-              : ""}
-          </p>
+          <p>Total supply: {totalSupplyValue ? totalSupplyValue : ""}</p>
           <button
-            onClick={() => totalSupplyRefetch}
+            onClick={handleGetTotalSupply}
             className="bg-emerald-800 text-white px-8 py-2 rounded-full text-ellipsis whitespace-nowrap overflow-hidden"
           >
             Query
@@ -236,9 +282,9 @@ export default function Home() {
         </div>
 
         <div className="flex flex-wrap justify-between items-center gap-4  w-full p border-solid border-b-2 border-emerald-950 py-4">
-          <p>Decimal: {decimalData ? decimalData.toString() : ""}</p>
+          <p>Decimal: {decimalValue ? decimalValue : ""}</p>
           <button
-            onClick={() => decimalRefetch}
+            onClick={handleGetDecimal}
             className="bg-emerald-800 text-white px-8 py-2 rounded-full text-ellipsis whitespace-nowrap overflow-hidden"
           >
             Query
@@ -254,10 +300,10 @@ export default function Home() {
               className="rounded-full  py-2 px-6 text-black"
             />
 
-            <p>Balance: {balanceOfData ? balanceOfData.toString() : ""}</p>
+            <p>Balance: {balanceValue ? balanceValue : ""}</p>
           </div>
           <button
-            onClick={() => balanceOfRefetch}
+            onClick={handleGetBalance}
             className="bg-emerald-800 text-white px-8 py-2 rounded-full text-ellipsis whitespace-nowrap overflow-hidden"
           >
             Query
@@ -280,10 +326,10 @@ export default function Home() {
               className="rounded-full  py-2 px-6 text-black"
             />
 
-            <p>Allowance: {allowanceData ? allowanceData.toString() : ""}</p>
+            <p>Allowance: {allowanceValue ? allowanceValue : ""}</p>
           </div>
           <button
-            onClick={() => allowanceRefetch}
+            onClick={handleGetAllowance}
             className="bg-emerald-800 text-white px-8 py-2 rounded-full text-ellipsis whitespace-nowrap overflow-hidden"
           >
             Query
