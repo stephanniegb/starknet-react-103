@@ -1,4 +1,4 @@
-export const useStringFromByteArray = ({
+export const getStringFromByteArray = ({
   pending_word,
 }: {
   pending_word: BigInt;

@@ -10,7 +10,7 @@ import {
   useExplorer,
 } from "@starknet-react/core";
 import { useMemo, useState } from "react";
-import { useStringFromByteArray } from "../../hooks";
+import { getStringFromByteArray } from "../../hooks";
 
 export default function Home() {
   const [nameValue, setNameValue] = useState("");
@@ -56,7 +56,7 @@ export default function Home() {
     if (nameData) {
       nameRefetch();
       const res = nameData as { [key: string]: any };
-      const hexStr = useStringFromByteArray({
+      const hexStr = getStringFromByteArray({
         pending_word: res.pending_word,
       });
       setNameValue(hexStr);
@@ -78,7 +78,7 @@ export default function Home() {
     if (symbolData) {
       symbolRefetch();
       const res = symbolData as { [key: string]: any };
-      const hexStr = useStringFromByteArray({
+      const hexStr = getStringFromByteArray({
         pending_word: res.pending_word,
       });
       setSymbolValue(hexStr);
